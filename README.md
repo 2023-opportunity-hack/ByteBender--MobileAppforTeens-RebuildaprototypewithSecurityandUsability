@@ -12,8 +12,9 @@ Our primary goal is to enhance the app by implementing new features, resolving b
 We were really inspired by the problem statement. Especially the fact that the app promotes safety among teenagers who face dating violence and other security problems. With a strong belief that we can revamp the app, we completely overhauled the app, adding more features, while keeping all the older features intact.
 
 ## Video Preview
-1. [Quick 4 mins demo](???)
+1. [Quick 3 mins demo](https://youtu.be/Vky0Z4xmUFc)
 2. [Complete User walkthrough](https://github.com/2023-opportunity-hack/ByteBender--MobileAppforTeens-RebuildaprototypewithSecurityandUsability/blob/main/SafeSpace%20-%20User%20Walkthrough.pdf)
+3. [Codebase walkthrough](https://www.loom.com/share/c571c782650f47559cbbbce9467f753e?sid=e3541f67-61d6-4678-a01a-5a8aadbfc615)
 
 ## Technologies Used 
 Purpose | Technologies
@@ -35,6 +36,9 @@ Deployment | APK File on GitHub Release
 - Create the chatroom in the form of a forum-style screen.
 - Retrieve information of nearby shelters and show all the locations on a map.
 - Find video resources on YouTube and implement some kind of player in-app. 
+
+## Deployment
+We are using GitHub Releases to host our APK File, which can be downloaded from [here](https://github.com/2023-opportunity-hack/ByteBender--MobileAppforTeens-RebuildaprototypewithSecurityandUsability/releases/download/0.0.1/SafeSpaceApp.apk)
 
 ## Contributers
 - Dhanush Vardhan - [GitHub](https://github.com/dhanush17-tech), [Devpost](https://devpost.com/dhanush17-tech) 
