@@ -35,7 +35,7 @@ Deployment | APK File on GitHub Release
 ## New Features
 - Create the chatroom in the form of a forum-style screen.
 - Retrieve information of nearby shelters and show all the locations on a map.
-- Find video resources on YouTube and implement some kind of player in-app. 
+- Find video resources on YouTube and implement an in-app player. 
 
 ## Deployment
 We are using GitHub Releases to host our APK File, which can be downloaded from [here](https://github.com/2023-opportunity-hack/ByteBender--MobileAppforTeens-RebuildaprototypewithSecurityandUsability/releases/download/0.0.1/SafeSpaceApp.apk)
