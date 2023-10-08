@@ -41,14 +41,16 @@ class _ForumState extends State<Forum> {
                 SizedBox(
                   height: 30,
                 ),
-                Container(
-                  height: 120,
-                  width: MediaQuery.of(context).size.width,
-                  child: TextField(
-                    style: TextStyle(color: Colors.white),
-                    controller: _queryController,
+          Container(
+                height: 120,
+                width: MediaQuery.of(context).size.width,
+                child: TextField(
+                  controller: _queryController,
+                  decoration: InputDecoration(    border: InputBorder.none, // Remove the black underline
+                    hintText: "Enter your abuse report here...",
                   ),
                 ),
+              ),
                 GestureDetector(
                   onTap: () {
                     FirebaseFirestore.instance.collection("forum").add({

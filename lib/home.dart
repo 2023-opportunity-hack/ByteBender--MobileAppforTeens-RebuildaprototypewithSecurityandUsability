@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_sms/flutter_sms.dart';
+import 'package:safe_space/document_abuse.dart';
 import 'package:safe_space/forum.dart';
  import 'package:firebase_storage/firebase_storage.dart';
 import 'package:location/location.dart';
@@ -1840,6 +1841,40 @@ sendSms();
                             ),
                             Text(
                               "Forum",
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                     GestureDetector(
+                      onTap: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (_) => AbusePage(phone)));
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 20),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.amber.withOpacity(0.2)),
+                              child: Icon(Icons.content_paste,
+                                  color: Colors.amber.withOpacity(1)),
+                            ),
+                            SizedBox(
+                              width: 8,
+                            ),
+                            Text(
+                              "Document Abuse",
                               style: TextStyle(
                                 fontSize: 15,
                                 color: Colors.white,

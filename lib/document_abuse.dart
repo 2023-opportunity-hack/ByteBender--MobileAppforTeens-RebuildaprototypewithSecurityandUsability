@@ -1,11 +1,12 @@
 import 'dart:io';
 
+import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:camera/camera.dart';
+
 
 class AbusePage extends StatefulWidget {
   final String phone;
@@ -53,10 +54,10 @@ class _AbusePageState extends State<AbusePage> {
   }
 
   final User? currentUser = FirebaseAuth.instance.currentUser;
-
+ XFile? pickedImage=XFile("");
   Future<String?> _pickImage() async {
     try {
-      final XFile? pickedImage =
+pickedImage =
           await _imagePicker.pickImage(source: ImageSource.gallery);
 
       if (pickedImage == null) return null; // User canceled image picking
@@ -67,7 +68,7 @@ class _AbusePageState extends State<AbusePage> {
           .ref()
           .child('abuse_reports/${currentUser!.uid}/${DateTime.now().millisecondsSinceEpoch}');
       final UploadTask uploadTask =
-          storageReference.putFile(File(pickedImage.path));
+          storageReference.putFile(File(pickedImage!.path));
 
       // Wait for the upload to complete
       await uploadTask.whenComplete(() => print('File Uploaded'));
@@ -88,49 +89,50 @@ class _AbusePageState extends State<AbusePage> {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.only(
-            top: 50.0,
-            left: 10,
-            right: 10,
+          top: 50.0,
+                left: 20,
+                right: 20,
           ),
           child: Column(
             children: [
               Text(
-                "Report Abuse",
-                style: TextStyle(
-                  fontSize: 19,
-                  color: Colors.blue,
-                  fontWeight: FontWeight.bold,
+                  "Keep record of your abuse !",
+                  style: TextStyle(
+                      fontSize: 19,
+                      color: Colors.blue,
+                      fontWeight: FontWeight.bold),
                 ),
-              ),
               SizedBox(
                 height: 30,
               ),
               Container(
-                height: 120,
+                
                 width: MediaQuery.of(context).size.width,
-                child: TextField(
-                  controller: _abuseController,
-                  decoration: InputDecoration(
-                    hintText: "Enter your abuse report here...",
-                  ),
-                ),
-              ),
-              SizedBox(height: 10),
-              _videoFile == null
-                  ? SizedBox()
-                  : AspectRatio(
-                      aspectRatio: _cameraController.value.aspectRatio,
-                      child: CameraPreview(_cameraController),
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(15),color: Colors.blue.withOpacity(0.5)),
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: _abuseController,
+                      decoration: InputDecoration(
+                            border: InputBorder.none, // Remove the black underline
+                        hintStyle: TextStyle(color:Colors.white),
+                        hintText: "Enter your abuse report here...",
+                      ),
                     ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  ElevatedButton(
-                    onPressed: _pickImage,
-                    child: Text("Select Image"),
-                  ),
-                ],
-              ),
+                       SizedBox(height: 10),
+             
+            pickedImage!.path=="" ? ElevatedButton(
+                onPressed: _pickImage,
+                child: Text("Select Image"),
+              ):Container(
+                width: 200,height:200,child:Image.file(File(pickedImage!.path),)),
+                  ],
+                  
+                ),
+              ),                    SizedBox(height: 20,),
+
+           
               GestureDetector(
                 onTap: () async {
                   // Upload _videoFile and _abuseController.text to Firestore
@@ -248,10 +250,15 @@ class AbuseReportWidget extends StatelessWidget {
             // abuse image here
           ),
           if (imageUrl != null)
-            SizedBox(
-              height: 10,
-              child: Image.network(imageUrl!),
+            Container(
+              height: 100,
+              
+              child: ClipRRect(
+                borderRadius:BorderRadius.circular(10),
+                child: Image.network(imageUrl!)),
             ),
+             SizedBox(
+              height: 10,)
         ],
       ),
     );
