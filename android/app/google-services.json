@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "406621233238",
+    "project_id": "be-safe-fcbc8",
+    "storage_bucket": "be-safe-fcbc8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:406621233238:android:339900c99cb5bcd2855bf7",
+        "android_client_info": {
+          "package_name": "com.example.safe_space"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPkYnJdOoJ1UEVaAXzTuhy5T8Wl27N14E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
