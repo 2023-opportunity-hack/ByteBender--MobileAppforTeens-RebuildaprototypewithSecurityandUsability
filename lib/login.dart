@@ -34,7 +34,7 @@ class _SigninState extends State<Signin> {
 
   Location location = new Location();
 
-  late LatLng mytarget;
+  late LatLng mytarget=LatLng(123213,2312312);
 
   late double lat;
   late double long;
@@ -162,6 +162,7 @@ class _SigninState extends State<Signin> {
                         child: TextFormField(
                           style: TextStyle(color: Colors.white),
                           controller: _password,
+                          obscureText: true,
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             focusedBorder: InputBorder.none,

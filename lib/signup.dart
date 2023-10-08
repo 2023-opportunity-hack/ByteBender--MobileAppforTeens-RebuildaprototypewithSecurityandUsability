@@ -36,7 +36,7 @@ class _SignupState extends State<Signup> {
       mytarget = LatLng(lat ?? 123213, long ?? 2312312);
     });
   }
-File image=File("");
+File image=File("none");
   Location location = new Location();
 
   late LatLng mytarget;
@@ -233,7 +233,7 @@ File image=File("");
                       ),
                       child: TextFormField(
                         controller: _password,
-                        style: TextStyle(
+                         style: TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold),
                         decoration: InputDecoration(
                           border: InputBorder.none,
@@ -274,6 +274,7 @@ File image=File("");
                       ),
                       child: TextFormField(
                         controller: _age,
+                                                  keyboardType: TextInputType.phone,
                         style: TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold),
                         decoration: InputDecoration(
@@ -346,7 +347,7 @@ File image=File("");
                       final pickedimage = await ImagePicker()
                           .pickImage(source: ImageSource.gallery);
 
-                      if (pickedimage != "") {
+                      if (pickedimage !="") {
                         setState(() {
                           image = File(pickedimage!.path);
                         });
@@ -358,12 +359,19 @@ File image=File("");
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
                             color: Color(4281937995)),
-                        child: image == ""
-                            ? Icon(
+                        child: image == File("none")
+                            ?  Container(
+                                height: 150,
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                     
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: Colors.blue.withOpacity(0.1)),
+                             child:Icon(
                                 Icons.upload_file,
                                 color: Colors.white,
                                 size: 100,
-                              )
+                              ) )
                             : Container(
                                 height: 150,
                                 width: double.infinity,
@@ -372,7 +380,7 @@ File image=File("");
                                         image: FileImage(image),
                                         fit: BoxFit.cover),
                                     borderRadius: BorderRadius.circular(10),
-                                    color: Colors.white),
+                                    color: Colors.blue.withOpacity(0.1)),
                               )),
                   ),
                   SizedBox(

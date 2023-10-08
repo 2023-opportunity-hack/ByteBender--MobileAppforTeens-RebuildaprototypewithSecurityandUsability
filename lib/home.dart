@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_sms/flutter_sms.dart';
 import 'package:safe_space/forum.dart';
  import 'package:firebase_storage/firebase_storage.dart';
 import 'package:location/location.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mobile_number/mobile_number.dart';
+import 'package:safe_space/videos.dart';
  import 'package:url_launcher/url_launcher.dart';
 // import 'package:flutter_sms/flutter_sms.dart';
 import 'dart:io' as io;
@@ -180,7 +182,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     });
   }
 
-  getMarkerData() async {
+    getMarkerData() async {
     FirebaseFirestore.instance
         .collection('users')
         .doc(widget.uid)
@@ -188,15 +190,17 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         .get()
         .then((value) async {
       for (int i = 0; i < value.docs.length; i++) {
+          print("This issick ${value.docs[i].data()["uid"]}");
+
         var position;
         var profile_pic;
         await FirebaseFirestore.instance
             .collection('users')
-            .doc(value.docs[i].data!()["uid"])
+            .doc(value.docs[i].data()["uid"])
             .get()
             .then((value) {
-          position = value.data()?[0]["location"];
-          profile_pic = value.data()?[0]["profile_pic"];
+          position = value.data()!["location"];
+          profile_pic = value.data()!["profile_pic"];
         });
 
         initMarker(position, profile_pic);
@@ -219,50 +223,39 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     setState(() {});
   }
 
-  getAlertContacts() async {
-    FirebaseFirestore.instance
-        .collection("users")
-        .doc(widget.uid)
-        .collection("contacts")
-        .get()
-        .then((value) {
-      for (int i = 0; i < value.docs.length; i++) {
-        alertContacts.add(value.docs[i].data()[0]["phone"]);
-      }
-    });
-  }
-
+Future<void> getAlertContacts() async {
+  await FirebaseFirestore.instance
+      .collection("users")
+      .doc(widget.uid)
+      .collection("contacts")
+      .get()
+      .then((value) {
+    alertContacts.clear(); // Clear the list before adding new values.
+    for (int i = 0; i < value.docs.length; i++) {
+      alertContacts.add(value.docs[i].data()["phone"]);
+    }
+  });
+}
   List<String> alertContacts = [];
 
-  // Future sendSms() async {
-  //   getAlertContacts();
-  //   try {
-  //     // for (int i = 0; i < alertContacts.length; i++) {
-  //     print(alertContacts);
-  //     // for (int i = 0; i < alertContacts.length; i++) {
-  //     //   await launch("tel://${alertContacts[i]}");
-  //     // }
-  //     // telephony.sendSmsByDefaultApp(
-  //     //     to: "0096597324554",
-  //     //     message:
-  //     //         "${name} of age ${age} is wanting help right now. Her current location is ${mylocation} and it would be best if you rush to the spot immediately."); //Replace a 'X' with 10 digit phone number
-  //     // print("Message sent to: " + alertContacts[i]);
 
-  //     String _result = await sendSMS(
-  //             message:
-  //                 "${name} of age ${age} is wanting help right now. Her current location is ${mylocation} and it would be best if you rush to the spot immediately.",
-  //             recipients: alertContacts + [emer])
-  //         .catchError((onError) {
-  //       print(onError);
-  //     });
-  //     print(_result);
+ 
 
-  //     //}
-  //   } on PlatformException catch (e) {
-  //     print(e.toString());
-  //   }
-  // }
+Future<String> sendSms() async {
+  await getAlertContacts(); // Await the completion of this function.
 
+  try {
+    String _result = await sendSMS(
+      message: "${name} of age ${age} is wanting help right now. Her current location is ${mylocation} and it would be best if you rush to the spot immediately.",
+      recipients: alertContacts + [emer],
+    );
+    print(_result);
+    return _result; // Return the result.
+  } on PlatformException catch (e) {
+    print(e.toString());
+    throw e; // Re-throw the exception if needed.
+  }
+}
   bool map_seen = false;
   TextEditingController _emergency = new TextEditingController();
   TextEditingController _editNameController = new TextEditingController();
@@ -292,7 +285,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
   void initState() {
     // TODO: implement initState
     super.initState();
-    // getMarkerData();
+    getMarkerData();
     // getuid();
     savelocation();
     // _init();
@@ -310,7 +303,6 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
     updateCurrentLocation();
 
     getuserinfo();
-    getMarkerData();
 
     _controller = AnimationController(vsync: this, duration: duration);
     _scaleAnimation = Tween<double>(begin: 1, end: 0.7).animate(_controller);
@@ -338,7 +330,9 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
 
   Location location = new Location();
 
-  List<Marker> _markers = [];
+  List<Marker> 
+  
+  _markers = [];
   // MapboxMapController _mapController;
   late String useruid;
 
@@ -359,7 +353,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
         phone = value["phone"];
         emer = value["emer"];
         panic_attacks = value["no_of_alerts"];
-        profile_pic ="https://firebasestorage.googleapis.com/v0/b/be-safe-fcbc8.appspot.com/o/2023-10-07%2018%3A26%3A10.195524user_image?alt=media&token=1b0a84f1-6a2b-40de-b513-02204e775c17";
+        profile_pic = value["profile_pic"];
         _editNameController = TextEditingController(text: name);
         _editAgeController = TextEditingController(text: age);
 
@@ -590,9 +584,50 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                         initialValue: 0,
                                         direction: Axis.vertical,
                                         withSpring: false,
-                                        onSlide: (int value) async {
-                                          // launch("tel://911");
-                                          // sendSms();
+                                        onChanged: (int value) async {
+
+                                          showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Select an option"),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {                     
+                                     launch("tel://911");
+
+                // Implement the action for "Call 911" here
+                Navigator.of(context).pop();
+                successDialog();
+                getuserinfo();
+              },
+              child: Text("Call 911"),
+            ),
+            TextButton(
+              onPressed: () {
+sendSms();
+
+                // Implement the action for "Send Broadcast" here
+                Navigator.of(context).pop();
+                                successDialog();
+
+              },
+              child: Text("Send Broadcast"),
+            ),
+            TextButton(
+              onPressed: () {
+                sendSms();
+                // Implement the action for "Phone a friend" here
+                Navigator.of(context).pop();
+                                successDialog();
+
+              },
+              child: Text("Phone a friend"),
+            ),
+          ],
+        );
+      },
+    );
                                           FirebaseFirestore.instance
                                               .collection("users")
                                               .doc(widget.uid)
@@ -601,146 +636,14 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                 FieldValue.increment(1)
                                           }, SetOptions(merge: true));
                                           getuserinfo();
-                                          showDialog(
-                                              context: context,
-                                              builder: (ctx) {
-                                                return ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  child: Container(
-                                                    height: 200,
-                                                    child: Dialog(
-                                                        shape: RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        10)),
-                                                        child: ClipRRect(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(10),
-                                                          child: Container(
-                                                            height: 200,
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          10),
-                                                            ),
-                                                            child: Stack(
-                                                              children: [
-                                                                Container(
-                                                                  height: 300,
-                                                                  child:
-                                                                      Padding(
-                                                                    padding: const EdgeInsets
-                                                                            .only(
-                                                                        top:
-                                                                            60.0),
-                                                                    child:
-                                                                        Center(
-                                                                      child:
-                                                                          Container(
-                                                                        child: lottie.Lottie.asset(
-                                                                            "assets/tick.json",
-                                                                            height:
-                                                                                300,
-                                                                            repeat:
-                                                                                false),
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                                SizedBox(
-                                                                    height: 10),
-                                                                Padding(
-                                                                  padding: const EdgeInsets
-                                                                          .only(
-                                                                      left: 8.0,
-                                                                      right: 8,
-                                                                      top: 15),
-                                                                  child: Align(
-                                                                    alignment:
-                                                                        Alignment
-                                                                            .topLeft,
-                                                                    child: Text(
-                                                                      "We have alerted 911 and all your alert contacts",
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontSize:
-                                                                            19,
-                                                                        fontWeight:
-                                                                            FontWeight.w600,
-                                                                        color: Colors
-                                                                            .blue,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        )),
-                                                  ),
-                                                );
-                                              });
-                                          print('Done');
-                                        }, key: Key("ederation"), onChanged: (int value) {  },
+                                          
+                                        }, key: Key("ederation"), onSlide: (int value) {  },
                                        ),
 
-                                      // SliderButton(
-                                      //   action: () {},
-
-                                      //   ///Do something here},label: Text(
-                                      //   label: Text(
-                                      //     "Slide to cancel Match",
-                                      //     style: TextStyle(
-                                      //         color: Color(0xff4a4a4a),
-                                      //         fontWeight: FontWeight.w500,
-                                      //         fontSize: 17),
-                                      //   ),
-                                      //   icon: Center(
-                                      //       child: Icon(
-                                      //     Icons.power_settings_new,
-                                      //     color: Colors.white,
-                                      //     size: 40.0,
-                                      //     semanticLabel: 'Text to announce in accessibility modes',
-                                      //   )),
-                                      //   buttonColor: Colors.blue,
-                                      //   backgroundColor: Colors.green,
-                                      //   highlightedColor: Colors.red,
-                                      //   baseColor: Colors.amber,
-                                      // )
-                                      // RotatedBox(
-                                      //     quarterTurns: 3,
-                                      //     child: SliderButton(
-                                      //       action: () {
-                                      //         ///Do something here
-                                      //       },
-                                      //       label: Text(
-                                      //         "Slide to cancel",
-                                      //         style: TextStyle(
-                                      //             color: Color(0xff4a4a4a),
-                                      //             fontWeight: FontWeight.w500,
-                                      //             fontSize: 17),
-                                      //       ),
-                                      //       buttonColor: Colors.black,
-                                      //       icon: Text(
-                                      //         "x",
-                                      //         style: TextStyle(
-                                      //           color: Colors.black,
-                                      //           fontWeight: FontWeight.w400,
-                                      //           fontSize: 30,
-                                      //         ),
-                                      //       ),
-                                      //     ))
                                     ]),
                               ),
 
-                              // Align(
-                              //     alignment: Alignment.center, child: Image.memory(byte_images[0])),
-
+                             
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 8.0),
                                 child: Align(
@@ -749,8 +652,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                       width: MediaQuery.of(context).size.width -
                                           30,
                                       height:
-                                          MediaQuery.of(context).size.height /
-                                              3.6,
+                                       220,
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(15),
                                         color: hexToColor("#212124"),
@@ -763,7 +665,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                       .size
                                                       .width -
                                                   30,
-                                              decoration: BoxDecoration(
+                                             decoration: BoxDecoration(
                                                   borderRadius:
                                                       BorderRadius.only(
                                                           topRight:
@@ -787,82 +689,9 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                     // _start();
                                                   },
                                                   onTapUp: (tapUp) async {
-                                                    print("upp");
-                                                    setState(() {
-                                                      isRippleSeen = false;
-                                                    });
-
-                                                    // await _stop();
-                                                    // print(_current.path);
-
-
-// // Initialize FirebaseStorage instance
-// FirebaseStorage storage = FirebaseStorage.instance;
-
-// // Create a reference to the desired location in Firebase Storage
-// Reference ref = storage.ref().child("recordings").child("${DateTime.now()}");
-
-// // Upload the file to the Firebase Storage location
-// UploadTask uploadTask = ref.putFile(io.File(_current.path!));
-
-// // Wait for the upload to complete
-// TaskSnapshot snapshot = await uploadTask.whenComplete(() {});
-
-// // Get the download URL for the uploaded file
-// String downloadURL = await snapshot.ref.getDownloadURL();
-
-// // Print the download URL
-// print(downloadURL);
-
-                                                    
-
-
-                                                    await FirebaseFirestore.instance
-                                                        .collection("users")
-                                                        .doc(widget.uid)
-                                                        .collection("contacts")
-                                                        .get()
-                                                        .then((value) async {
-                                                      print(phone);
-
-                                                      for (int i = 0;
-                                                          i <
-                                                              value.docs
-                                                                  .length;
-                                                          i++) {
-                                                        FirebaseFirestore.instance
-                                                            .collection("users")
-                                                            .doc(value
-                                                                .docs[i]
-                                                                .data()["uid"])
-                                                            .collection(
-                                                                "messeages")
-                                                            .doc()
-                                                            .set({
-                                                          "date":
-                                                              DateTime.now(),
-                                                          "uid": widget.uid,
-                                                          "phone_now": phone,
-                                                          // "url_audio": downloadURL,
-                                                          "dp": profile_pic,
-                                                          "name": name,
-                                                        }).then((_) => FirebaseFirestore
-                                                                    .instance
-                                                                    .collection(
-                                                                        "users")
-                                                                    .doc(value
-                                                                        .docs[
-                                                                            i]
-                                                                        .data()["uid"])
-                                                                    .set({
-                                                                  "isseen":
-                                                                      false,
-                                                                }, SetOptions(merge: true)));
-                                                      }
-                                                    });
+                                                 Navigator.push(context, MaterialPageRoute(builder:(c)=>VideoScreen()));
                                                   },
-                                                  child: isRippleSeen == false
-                                                      ? Container(
+                                                  child: Container(
                                                           width: 45,
                                                           height: 45,
                                                           decoration:
@@ -870,33 +699,18 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                                   shape: BoxShape
                                                                       .circle,
                                                                   color: Colors
-                                                                      .orange),
+                                                                      .red),
                                                           child: Icon(
-                                                            Icons.mic_outlined,
-                                                            color: Colors.black,
+                                                            Icons.play_arrow_rounded,
+                                                            color: Colors.white,
                                                           ),
                                                         )
-                                                      : Container(
-                                                            width: 45,
-                                                            height: 45,
-                                                            decoration:
-                                                                BoxDecoration(
-                                                                    shape: BoxShape
-                                                                        .circle,
-                                                                    color: Colors
-                                                                        .white),
-                                                            child: Icon(
-                                                              Icons
-                                                                  .mic_outlined,
-                                                              color:
-                                                                  Colors.blue,
-                                                            ),
-                                                          ),
+                                                     
                                                         ),
                                                 
-                                                SizedBox(width: 20),
+                                                SizedBox(width: 10),
                                                 Text(
-                                                  "Record Audio To Send ",
+                                                  "Safety Resources to watch",
                                                   style: TextStyle(
                                                       color: Colors.white,
                                                       fontSize: 20,
@@ -918,7 +732,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                         color:
                                                             Color(4278217470),
                                                         fontWeight:
-                                                            FontWeight.w500,
+                                                            FontWeight.bold,
                                                         fontSize: 19))),
                                           ),
                                           SizedBox(
@@ -1292,7 +1106,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                           child: CircleAvatar(
                             backgroundColor: Color(4278272638),
                             backgroundImage: NetworkImage(
-                              profile_pic !=""?"https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg":"",
+                              profile_pic ==""?"https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg":profile_pic,
                             ),
                             radius: 40,
                           ),
@@ -1428,7 +1242,9 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                                 });
                                               },
                                               controller: _phoneController,
+                                                  keyboardType: TextInputType.phone,
                                               cursorColor: Colors.blue,
+                                              
                                               decoration: InputDecoration(
                                                 hintText: "Mobile Number",
                                                 hintStyle: TextStyle(
@@ -1603,9 +1419,9 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                             style:
                                                 TextStyle(color: Colors.blue),
                                             inputFormatters: [],
-                                            keyboardType: TextInputType.number,
+                                            keyboardType: TextInputType.phone,
                                             onChanged: (value) {},
-                                            controller: _editAgeController,
+                                            controller: _editPhoneController,
                                             cursorColor: Colors.blue,
                                             textCapitalization:
                                                 TextCapitalization.words,
@@ -1630,7 +1446,7 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                             keyboardType: TextInputType.number,
                                             onChanged: (value) {},
                                             cursorColor: Colors.blue,
-                                            controller: _editPhoneController,
+                                            controller: _editAgeController,
                                             textCapitalization:
                                                 TextCapitalization.words,
                                             decoration: InputDecoration(
@@ -1722,139 +1538,128 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                       padding: EdgeInsets.only(top: 30),
                       child: GestureDetector(
                         onTap: () {
-                          showDialog(
-                              context: context,
-                              builder: (ctx) {
-                                return StatefulBuilder(
-                                    builder: (ctx, setState) {
-                                  return AlertDialog(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(10),
-                                      ),
-                                    ),
-                                    title: Text(
-                                      'Alert Contacts',
-                                    ),
-                                    content: Container(
-                                      height: 200,
-                                      child: Column(
-                                        children: [
-                                          StreamBuilder(
-                                              stream: FirebaseFirestore.instance
-                                                  .collection("users")
-                                                  .doc(widget.uid)
-                                                  .collection("contacts")
-                                                  .snapshots(),
-                                              builder: (context, snapshot) {
-                                                return ListView.separated(
-                                                  shrinkWrap: true,
-                                                  itemBuilder: (ctx, i) {
-                                                    return StreamBuilder(
-                                                        stream: FirebaseFirestore
-                                                            .instance
-                                                            .collection("users")
-                                                            .doc(snapshot
-                                                                    .data!
-                                                                    .docs[
-                                                                i]["uid"])
-                                                            .snapshots(),
-                                                        builder:
-                                                            (context, snap) {
-                                                          return snap.data ==
-                                                                  null
-                                                              ? Container()
-                                                              : Container(
-                                                                  child: Row(
-                                                                    children: [
-                                                                      Container(
-                                                                        width:
-                                                                            55,
-                                                                        height:
-                                                                            55,
-                                                                        decoration: BoxDecoration(
-                                                                            // shape:
-                                                                            //     BoxShape.circle,
-                                                                            borderRadius: BorderRadius.circular(10),
-                                                                            image: DecorationImage(fit: BoxFit.cover, image: NetworkImage(snap.data!["profile_pic"]))),
-                                                                      ),
-                                                                      SizedBox(
-                                                                          width:
-                                                                              10),
-                                                                      Column(
-                                                                        crossAxisAlignment:
-                                                                            CrossAxisAlignment.start,
-                                                                        mainAxisAlignment:
-                                                                            MainAxisAlignment.spaceBetween,
-                                                                        children: [
-                                                                          Container(
-                                                                            width:
-                                                                                170,
-                                                                            child:
-                                                                                Expanded(
-                                                                              child: SingleChildScrollView(
-                                                                                scrollDirection: Axis.horizontal,
-                                                                                child: Text(
-                                                                                  snap.data!["name"],
-                                                                                  style: TextStyle(color: Colors.blue, fontSize: 17),
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                          ),
-                                                                          SizedBox(
-                                                                            height:
-                                                                                6,
-                                                                          ),
-                                                                          Text(
-                                                                            snap.data!["phone"],
-                                                                            style:
-                                                                                TextStyle(
-                                                                              fontSize: 14,
-                                                                              color: Colors.grey,
-                                                                            ),
-                                                                          ),
-                                                                        ],
-                                                                      )
-                                                                    ],
-                                                                  ),
-                                                                );
-                                                        });
-                                                  },
-                                                  separatorBuilder: (ctx, i) {
-                                                    return SizedBox(height: 20);
-                                                  },
-                                                  itemCount: snapshot
-                                                      .data!.docs.length,
-                                                );
-                                              })
-                                        ],
-                                      ),
-                                    ),
-                                    actions: <Widget>[
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(10),
-                                        child: TextButton(
-                                                                style: TextButton.styleFrom(
-                                          primary: Colors.blue.withOpacity(0.3),
-
-     shape:  RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(10),
-  ),),        
-                   
-                                          onPressed: () async {
-                                            Navigator.pop(context);
-                                          },
-                                          child: Text(
-                                            'Done',
-                                            style:
-                                                TextStyle(color: Colors.blue),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                });
-                              });
+                        showDialog(
+  context: context,
+  builder: (ctx) {
+    return StatefulBuilder(
+      builder: (ctx, setState) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(10),
+            ),
+          ),
+          title: Text(
+            'Alert Contacts',
+          ),
+          content: Container(
+            height: 200,
+            child: Column(
+              children: [
+                StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection("users")
+                      .doc(widget.uid)
+                      .collection("contacts")
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    return snapshot.data==null?Container(): ListView.separated(
+  shrinkWrap: true,
+  itemBuilder: (ctx, i) {
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance
+          .collection("users")
+          .doc(snapshot.data!.docs[i]["uid"])
+          .snapshots(),
+      builder: (context, snap) {
+        return  snap.data==null?Container():Container(
+                child: Row(
+                  children: [
+                    Container(
+                      width: 45,
+                      height: 45,
+                      decoration: BoxDecoration(
+                        // shape: BoxShape.circle,
+                        borderRadius: BorderRadius.circular(10),
+                        image: DecorationImage(
+                          fit: BoxFit.cover,
+                          image: NetworkImage(
+                              snap.data!["profile_pic"]),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          width: 170,
+                          child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Text(
+                                snap.data!["name"] ?? "",
+                                style: TextStyle(
+                                    color: Colors.blue, fontSize: 17),
+                              ),
+                          
+                          ),
+                        ),
+                        SizedBox(
+                          height: 6,
+                        ),
+                        Text(
+                          snap.data!["phone"],
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+      },
+    );
+  },
+  separatorBuilder: (ctx, i) {
+    return SizedBox(height: 20);
+  },
+  itemCount: snapshot.data!.docs.length,
+);
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: TextButton(
+                style: TextButton.styleFrom(
+                  primary: Colors.blue.withOpacity(0.3),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                onPressed: () async {
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  'Done',
+                  style: TextStyle(color: Colors.blue),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  },
+);
                         },
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -1917,8 +1722,8 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                                               onChanged: (value) {},
                                               cursorColor: Colors.blue,
                                               controller: _emergency,
-                                              textCapitalization:
-                                                  TextCapitalization.words,
+                                              
+                                                  keyboardType: TextInputType.phone,
                                               decoration: InputDecoration(
                                                 hintText: "Emergency Number",
                                                 hintStyle: TextStyle(
@@ -2044,10 +1849,44 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
                           ],
                         ),
                       ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                       FirebaseAuth.instance.signOut().then((value) =>   Navigator.push(context,
+                            MaterialPageRoute(builder: (_) => Signin())));  },
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 20),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.red.withOpacity(0.2)),
+                              child: Icon(Icons.exit_to_app_rounded,
+                                  color: Colors.red.withOpacity(1)),
+                            ),
+                            SizedBox(
+                              width: 8,
+                            ),
+                            Text(
+                              "Log Out",
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
                     )
                   ],
                 ),
               ),
+              
               SizedBox(
                 height: 20,
               ),
@@ -2104,7 +1943,95 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin {
       ),
     );
   }
+
+Future successDialog(){
+return showDialog(
+                                              context: context,
+                                              builder: (ctx) {
+                                                return ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  child: Container(
+                                                    height: 200,
+                                                    child: Dialog(
+                                                        shape: RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10)),
+                                                        child: ClipRRect(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
+                                                          child: Container(
+                                                            height: 200,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10),
+                                                            ),
+                                                            child: Stack(
+                                                              children: [
+                                                                Container(
+                                                                  height: 300,
+                                                                  child:
+                                                                      Padding(
+                                                                    padding: const EdgeInsets
+                                                                            .only(
+                                                                        top:
+                                                                            60.0),
+                                                                    child:
+                                                                        Center(
+                                                                      child:
+                                                                          Container(
+                                                                        child: lottie.Lottie.asset(
+                                                                            "assets/tick.json",
+                                                                            height:
+                                                                                300,
+                                                                            repeat:
+                                                                                false),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                SizedBox(
+                                                                    height: 10),
+                                                                Padding(
+                                                                  padding: const EdgeInsets
+                                                                          .only(
+                                                                      left: 8.0,
+                                                                      right: 8,
+                                                                      top: 15),
+                                                                  child: Align(
+                                                                    alignment:
+                                                                        Alignment
+                                                                            .topLeft,
+                                                                    child: Text(
+                                                                      "We have alerted 911 and all your alert contacts",
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontSize:
+                                                                            19,
+                                                                        fontWeight:
+                                                                            FontWeight.w600,
+                                                                        color: Colors
+                                                                            .blue,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        )),
+                                                  ),
+                                                );
+                                              });
 }
+}
+
 
 Color hexToColor(String code) {
   return new Color(int.parse(code.substring(1, 7), radix: 16) + 0xFF000000);

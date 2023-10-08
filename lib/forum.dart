@@ -27,8 +27,8 @@ class _ForumState extends State<Forum> {
           child: Padding(
               padding: const EdgeInsets.only(
                 top: 50.0,
-                left: 10,
-                right: 10,
+                left: 20,
+                right: 20,
               ),
               child: Column(children: [
                 Text(
@@ -45,6 +45,7 @@ class _ForumState extends State<Forum> {
                   height: 120,
                   width: MediaQuery.of(context).size.width,
                   child: TextField(
+                    style: TextStyle(color: Colors.white),
                     controller: _queryController,
                   ),
                 ),
@@ -56,10 +57,10 @@ class _ForumState extends State<Forum> {
                     });
                   },
                   child: Container(
-                    height: 40,
+                    height: 50,
                     width: double.infinity,
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
+                        borderRadius: BorderRadius.circular(15),
                         color: Colors.blue),
                     child: Center(
                       child: Align(
@@ -99,7 +100,7 @@ class _ForumState extends State<Forum> {
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(15),
                                         color: Colors.blue.withOpacity(0.3)),
-                                    padding: EdgeInsets.all(8),
+                                    padding: EdgeInsets.all(15),
                                     child: Column(
                                       children: [
                                         Row(
@@ -200,8 +201,9 @@ class _ForumState extends State<Forum> {
                                                 width: MediaQuery.of(context)
                                                         .size
                                                         .width -
-                                                    90,
+                                                    120,
                                                 child: TextField(
+                                                                      style: TextStyle(color: Colors.white),
                                                   controller:
                                                       _commentController,
                                                 )),

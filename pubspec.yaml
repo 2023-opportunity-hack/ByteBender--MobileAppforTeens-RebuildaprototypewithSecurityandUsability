@@ -53,6 +53,8 @@ dependencies:
   simple_gradient_text:
   lottie:
   flutter_map:
+  flutter_sms: ^2.3.3
+  youtube_player_flutter: ^8.1.2
 
   
 
