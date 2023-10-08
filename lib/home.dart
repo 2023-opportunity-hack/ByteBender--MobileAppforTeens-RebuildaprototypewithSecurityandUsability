@@ -11,6 +11,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mobile_number/mobile_number.dart';
 import 'package:safe_space/videos.dart';
+import 'package:safe_space/web_view.dart';
  import 'package:url_launcher/url_launcher.dart';
 // import 'package:flutter_sms/flutter_sms.dart';
 import 'dart:io' as io;
@@ -332,8 +333,19 @@ Future<String> sendSms() async {
   Location location = new Location();
 
   List<Marker> 
-  
-  _markers = [];
+_markers = [Marker(point: LatLng(33.41253 ,-111.83189), builder: (ctx){
+    return Container(width: 40,height: 40,child:Icon(Icons.location_on_rounded,size: 45,color: Colors.red.withOpacity(0.6),));
+  }),Marker(point: LatLng(33.4150 , -111.8946), builder: (ctx){
+    return Container(width: 40,height: 40,child:Icon(Icons.location_on_rounded,size: 45,color: Colors.red.withOpacity(0.6),));
+  }),Marker(point: LatLng(33.4229 ,-111.9384), builder: (ctx){
+    return Container(width: 40,height: 40,child:Icon(Icons.location_on_rounded,size: 45,color: Colors.red.withOpacity(0.6),));
+  }),Marker(point: LatLng(33.4163 ,-111.8455), builder: (ctx){
+    return Container(width: 40,height: 40,child:Icon(Icons.location_on_rounded,size: 45,color: Colors.red.withOpacity(0.6),));
+  }),Marker(point: LatLng(33.4012 ,-111.9575), builder: (ctx){
+    return Container(width: 40,height: 40,child:Icon(Icons.location_on_rounded,size: 45,color: Colors.red.withOpacity(0.6),));
+  }),Marker(point: LatLng(33.4492959 ,-111.9677444), builder: (ctx){
+    return Container(width: 40,height: 40,child:Icon(Icons.location_on_rounded,size: 45,color: Colors.red.withOpacity(0.6),));
+  })];
   // MapboxMapController _mapController;
   late String useruid;
 
@@ -581,13 +593,15 @@ Future<String> sendSms() async {
                                                   });
                                                  },
                                               )),
-                                      StepperTouch(
-                                        initialValue: 0,
-                                        direction: Axis.vertical,
-                                        withSpring: false,
-                                        onChanged: (int value) async {
+                                      Column(
+                                        children: [
+                                          StepperTouch(
+                                            initialValue: 0,
+                                            direction: Axis.vertical,
+                                            withSpring: false,
+                                            onChanged: (int value) async {
 
-                                          showDialog(
+                                              showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -629,17 +643,36 @@ sendSms();
         );
       },
     );
-                                          FirebaseFirestore.instance
-                                              .collection("users")
-                                              .doc(widget.uid)
-                                              .set({
-                                            "no_of_alerts":
-                                                FieldValue.increment(1)
-                                          }, SetOptions(merge: true));
-                                          getuserinfo();
-                                          
-                                        }, key: Key("ederation"), onSlide: (int value) {  },
-                                       ),
+                                              FirebaseFirestore.instance
+                                                  .collection("users")
+                                                  .doc(widget.uid)
+                                                  .set({
+                                                "no_of_alerts":
+                                                    FieldValue.increment(1)
+                                              }, SetOptions(merge: true));
+                                              getuserinfo();
+                                              
+                                            }, key: Key("ederation"), onSlide: (int value) {  },
+                                           ),
+                              SizedBox(height:10),
+                                             
+                                             GestureDetector(
+onTap:(){
+  Navigator.push(context,MaterialPageRoute(builder: (s)=>WebViewScreen()));
+}
+                                               ,child: Container(
+                                                                           
+                                                                             width: 50,
+                                                                             height: 50,
+                                                                             decoration: BoxDecoration(
+                                                                                 shape: BoxShape.circle,
+                                                                                 color: Colors.green.withOpacity(0.2)),
+                                                                             child: Icon(Icons.web,
+                                                                                 color: Colors.green.withOpacity(1)),
+                                                                           ),
+                                             ),
+                                        ],
+                                      ),
 
                                     ]),
                               ),
@@ -925,6 +958,10 @@ sendSms();
                                                                                       ),
                                                                                       child: Icon(
                                                                                         Icons.call,
+
+
+
+
                                                                                         size: 15,
                                                                                         color: Colors.blue,
                                                                                       )),

@@ -38,6 +38,7 @@ dependencies:
   camera:
   # flutter_sms:
   latlong2:
+  webview_flutter:
   google_fonts:
   image_picker:
   firebase_storage:

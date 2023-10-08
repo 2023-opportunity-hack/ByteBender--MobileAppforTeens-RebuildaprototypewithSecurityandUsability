@@ -9,8 +9,8 @@ class VideoScreen extends StatefulWidget {
 class _VideoScreenState extends State<VideoScreen> {
   // Replace these video URLs with your own YouTube video URLs.
   final List<String> videoUrls = [
-    'https://www.youtube.com/watch?v=2o2dlueLmkM',
-    'https://www.youtube.com/watch?v=2o2dlueLmkM',
+    'https://www.youtube.com/watch?v=SY7RhBszp0k',
+    'https://www.youtube.com/watch?v=RCGPuLur4fk',
     // Add more video URLs as needed.
   ];
 

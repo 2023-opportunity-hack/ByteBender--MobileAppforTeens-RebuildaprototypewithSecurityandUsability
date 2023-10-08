@@ -151,6 +151,7 @@ pickedImage =
                   _abuseController.clear();
                   setState(() {
                     _videoFile = null;
+                      pickedImage!.path=="" ;
                   });
                 },
                 child: Container(
@@ -224,41 +225,46 @@ class AbuseReportWidget extends StatelessWidget {
         color: Colors.blue.withOpacity(0.3),
       ),
       padding: EdgeInsets.all(8),
-      child: Column(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(
-            height: 15,
-          ),
-          const Text(
-            "Abuse Report:",
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.blue,
+         Align(
+          alignment: Alignment.topCenter,
+           child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+             const SizedBox(
+              height: 15,
             ),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Text(
-            message,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
+            const Text(
+              "Abuse Report",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue,
+              ),
             ),
-            // abuse image here
-          ),
+            SizedBox(
+              height: 10,
+            ),
+            Text(
+              message,
+              textAlign: TextAlign.start,
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              // abuse image here
+            ),
+           ],),
+         ),
           if (imageUrl != null)
-            Container(
-              height: 100,
-              
-              child: ClipRRect(
-                borderRadius:BorderRadius.circular(10),
-                child: Image.network(imageUrl!)),
-            ),
-             SizedBox(
-              height: 10,)
+            ClipRRect(
+              borderRadius:BorderRadius.circular(10),
+              child: Image.network(imageUrl!,height: 100,)),
+            
         ],
       ),
     );
